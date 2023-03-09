@@ -26,32 +26,8 @@ string programToString(string &filename) {
     return bfProgram;
 }
 
-//Checks that every loop in the program has an open and close bracket and stores their positions, so it doesn't have to do it every time it reaches one
-vector<pair<int, int>> getLoops(string &program) {
-    vector<pair<int, int>> loops;
-    for (int i = 0; i < program.size(); i++) {
-        if (program[i] == '[') {
-            pair<int, int> loop;
-            loop.first = i;
-            int openBrackets = 1;
-            for (int j = i+1; j < program.size() && openBrackets > 0; j++) {
-                if (program[j] == '[') {
-                    openBrackets++;
-                } else if (program[j] == ']') {
-                    openBrackets--;
-                    if (openBrackets == 0) {
-                        loop.second = j;
-                    }
-                }
-            }
-            if (openBrackets > 0) {
-                cout << "There's a closing bracket missing";
-                return {{-1, -1}};
-            }
-            loops.push_back(loop);
-        }
-    }
-    return loops;
+string getFileExtension(string &filename) {
+    return filename.substr(filename.find_last_of('.') + 1);
 }
 
 int main(int argc, char *argv[]) {
@@ -64,27 +40,20 @@ int main(int argc, char *argv[]) {
         getline(cin, filename);
     }
     bool inputPrompt = false;
-    if ((argc == 2 && strcmp(argv[1], "--input-prompt") == 0) || (argc == 3 && strcmp(argv[2], "--input-prompt") == 0)) {
-        inputPrompt = true;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--input-prompt") == 0) {
+            inputPrompt = true;
+        }
     }
 
     //Setup
+    if (getFileExtension(filename).compare("bf") != 0) {
+        cout << "The file extension isn't .bf but will try to run anyways." << endl;
+    }
     string program = programToString(filename);
     vector<unsigned char> memory(30000, 0);
     int pointer = 0;
     int instructionIndex = 0;
-    int loopStart;
-    int loopEnd;
-    int currentLoop = 0;
-    vector<pair<pair<int, int>, int>> pendingLoops;
-    vector<pair<int, int>> loops = getLoops(program);
-    if (!loops.empty() && loops[0].first == -1) {
-        return 1;
-    } else if (!loops.empty()) {
-        loopStart = loops[currentLoop].first;
-        loopEnd = loops[currentLoop].second;
-        pendingLoops.push_back({loops[currentLoop], currentLoop});
-    }
 
     //Interpreter
     while (instructionIndex < program.size()) {
@@ -107,29 +76,39 @@ int main(int argc, char *argv[]) {
             getline(cin, s);
             memory[pointer] = (s.empty()) ? 0 : s[0];
         } else if (instruction == '[') {
-            //If we're not in the right loop, it will get it from the loops list and set it as current and add it to the pending loops list
-            if (loops[currentLoop].first != instructionIndex) {
-                for (int i = 0; i < loops.size(); i++) {
-                    if (loops[i].first == instructionIndex) {
-                        currentLoop = i;
-                        loopStart = loops[i].first;
-                        loopEnd = loops[i].second;
-                        pendingLoops.push_back({loops[i], currentLoop});
+            if (memory[pointer] == 0) {
+                int openBrackets = 1;
+                for (int i = instructionIndex+1; i < program.size() && openBrackets > 0; i++) {
+                    if (program[i] == '[') {
+                        openBrackets++;
+                    } else if (program[i] == ']') {
+                        openBrackets--;
+                        if (openBrackets == 0) {
+                            instructionIndex = i;
+                        }
                     }
                 }
-            }
-            if (memory[pointer] == 0) {
-                instructionIndex = loopEnd;
-                pendingLoops.pop_back();
-                //If there's nesting loops, it will set the parent as current
-                if (!pendingLoops.empty()) {
-                    loopStart = pendingLoops[pendingLoops.size()-1].first.first;
-                    loopEnd = pendingLoops[pendingLoops.size()-1].first.second;
-                    currentLoop = pendingLoops[pendingLoops.size()-1].second;
+                if (openBrackets > 0) {
+                    cout << endl << "There's an opening bracket that doesn't close on instruction " << instructionIndex << endl;
+                    return 1;
                 }
             }
         } else if (instruction == ']') {
-            instructionIndex = loopStart - 1;
+            int closingBrackets = 1;
+            for (int i = instructionIndex-1; i >= 0 && closingBrackets > 0; i--) {
+                if (program[i] == ']') {
+                    closingBrackets++;
+                } else if (program[i] == '[') {
+                    closingBrackets--;
+                    if (closingBrackets == 0) {
+                        instructionIndex = i - 1;
+                    }
+                }
+            }
+            if (closingBrackets > 0) {
+                cout << endl << "There's a closing bracket that doesn't open on instruction " << instructionIndex << endl;
+                return 1;
+            }
         }
         instructionIndex++;
     }

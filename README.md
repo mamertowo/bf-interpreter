@@ -9,6 +9,7 @@ Open a terminal where you saved the .exe and run it.
 ```bash
 ./bf.exe [PATH] [--input-prompt]
 ```
+The program should be a .bf file for clarity, but any normal text file will work.
 
 ## Arguments
 `PATH` is the path where the brainfuck program is located. If you don't provide a path here you will be prompted to give one once you run the interpreter. If you do give a path here, it HAS to be the first argument.\
