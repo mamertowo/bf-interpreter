@@ -11,5 +11,5 @@ Open a terminal where you saved the .exe and run it.
 ```
 
 ## Arguments
-`PATH` is the path where the brainfuck program is located. If you don't provide a path here you will be prompted to give one once you run the interpreter. If you do give a path here, it HAS to be the first argument.
+`PATH` is the path where the brainfuck program is located. If you don't provide a path here you will be prompted to give one once you run the interpreter. If you do give a path here, it HAS to be the first argument.\
 You can use `--input-prompt` to show a prompt for input when you use `,`. Not ideal.
