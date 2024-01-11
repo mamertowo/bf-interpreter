@@ -66,6 +66,8 @@ void runScript(char* script, int prompt, int lf) {
             case ']':
                 if (currLoop == NULL) {
                     printf("\nThere's a \"]\" that's missing its \"[\".\n");
+                    free(script);
+                    free(mem);
                     exit(EXIT_FAILURE);
                 } else if (mem[mPos]) {
                     iPos = currLoop->pos;
