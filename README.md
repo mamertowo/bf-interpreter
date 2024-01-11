@@ -1,16 +1,16 @@
 # Brainfuck interpreter
-A brainfuck interpreter made with C++. It can read a bf program from a text file and outputs it to the terminal.
+A brainfuck interpreter made in C (previously C++). Read a bf script from a text file and output it to the terminal.
 
 ## Installation
-Download `bf.exe` from the latest release.
+Download the appropriate binary file from the latest release.
 
 ## Usage
-Open a terminal where you saved the .exe and run it.
 ```bash
-./bf.exe [PATH] [--input-prompt]
+./bf PATH [-p, --prompt] [-lf]
 ```
 The program should be a .bf file for clarity, but any normal text file will work.
 
 ## Arguments
-`PATH` is the path where the brainfuck program is located. If you don't provide a path here you will be prompted to give one once you run the interpreter. If you do give a path here, it HAS to be the first argument.\
-You can use `--input-prompt` to show a prompt for input when you use `,`. Not ideal.
+`PATH` is the path where the brainfuck script is located.
+You can use `-p` or `--prompt` to show a prompt for input when you use `,`. Not ideal.
+`-lf` makes it so that line feeds (`\n`) get read as 10 instead of 0.
